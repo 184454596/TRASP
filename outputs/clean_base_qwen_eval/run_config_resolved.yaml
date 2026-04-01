@@ -1,0 +1,162 @@
+protocol_path: /home/Wangjl/TRASP/configs/protocol/base_qwen_eval.yaml
+protocol:
+  protocol_name: base_qwen_eval
+  project_root: /home/Wangjl/TRASP
+  includes:
+    datasets: /home/Wangjl/TRASP/configs/datasets.yaml
+    judges: /home/Wangjl/TRASP/configs/judges.yaml
+    metrics: /home/Wangjl/TRASP/configs/metrics.yaml
+    transforms: /home/Wangjl/TRASP/configs/transforms.yaml
+  paths:
+    manifests_dir: /home/Wangjl/TRASP/data/processed/manifests
+    manifest_summary_path: /home/Wangjl/TRASP/data/processed/manifests/manifest_summary.json
+    output_root: /home/Wangjl/TRASP/outputs
+  target_model:
+    name: qwen2.5-7b-instruct
+    path: /home/Wangjl/models/Qwen/Qwen2.5-7B-Instruct
+  safety_judge:
+    name: harmbench_llama2_13b_cls
+    path: /home/Wangjl/TRASP/models/HarmBench-Llama-2-13b-cls
+  runtime:
+    run_name: clean_base_qwen_eval
+    device_map: auto
+    torch_dtype: bfloat16
+    seed: 42
+    sample_cache: true
+  generation:
+    batch_size: 4
+    max_input_tokens: 2048
+    max_new_tokens: 256
+    do_sample: false
+    temperature: 0.0
+    top_p: 1.0
+    top_k: 0
+    repetition_penalty: 1.0
+    use_cache: true
+  eval_protocol:
+    harmful_eval:
+      source_groups:
+      - harmbench_text
+      - advbench
+      manifests:
+      - harmful_eval_harmbench_text.jsonl
+      - harmful_eval_advbench.jsonl
+      - harmful_eval_unified.jsonl
+    utility_eval:
+      source_group: gsm8k_test
+      manifests:
+      - gsm8k_test.jsonl
+    benign_refusal_eval:
+      source_group: xstest_safe_eval
+      manifests:
+      - xstest_safe_eval.jsonl
+  transforms:
+    enabled:
+    - lora_r8_s3_gsm8k
+    - lora_r16_s3_gsm8k
+    - mag20
+    - wanda20
+datasets:
+  schema:
+    required_fields:
+    - sample_id
+    - source_dataset
+    - split
+    - prompt
+    - answer
+    - label
+    - meta
+  raw_sources:
+    harmbench_text:
+      type: csv
+      preferred_path: /home/Wangjl/TRASP/external/HarmBench/data/behavior_datasets/harmbench_behaviors_text_test.csv
+      fallback_path: /home/Wangjl/TRASP/external/HarmBench/data/behavior_datasets/harmbench_behaviors_text_all.csv
+      output_manifest: harmful_eval_harmbench_text.jsonl
+      output_split: harmful_eval_harmbench_text
+      source_dataset: harmbench_text
+    advbench:
+      type: hf_saved_dataset
+      path: /home/Wangjl/TRASP/data/raw/advbench
+      split: train
+      output_manifest: harmful_eval_advbench.jsonl
+      output_split: harmful_eval_advbench
+      source_dataset: advbench
+    gsm8k:
+      type: hf_saved_dataset
+      path: /home/Wangjl/TRASP/data/raw/gsm8k
+      train_split: train
+      test_split: test
+      output_manifests:
+        train: gsm8k_train.jsonl
+        test: gsm8k_test.jsonl
+      output_splits:
+        train: gsm8k_train
+        test: gsm8k_test
+      source_dataset: gsm8k
+    xstest:
+      type: hf_saved_dataset
+      path: /home/Wangjl/TRASP/data/raw/xstest
+      split: train
+      safe_label_value: safe
+      output_manifest: xstest_safe_eval.jsonl
+      output_split: xstest_safe_eval
+      source_dataset: xstest
+  derived_manifests:
+    harmful_eval_unified:
+      output_manifest: harmful_eval_unified.jsonl
+      output_split: harmful_eval_unified
+      source_datasets:
+      - harmbench_text
+      - advbench
+judges:
+  safety_judges:
+    primary:
+      name: harmbench_llama2_13b_cls
+      type: local_hf_classifier
+      path: /home/Wangjl/TRASP/models/HarmBench-Llama-2-13b-cls
+      task: harmfulness_classification
+      positive_label: harmful
+      runtime:
+        device_map: auto
+        torch_dtype: bfloat16
+        batch_size: 4
+        max_input_tokens: 2048
+        max_new_tokens: 5
+        do_sample: false
+        temperature: 0.0
+metrics:
+  metrics:
+    safety_asr:
+      type: judge_binary_asr
+      judge: primary
+      positive_label: harmful
+      eval_groups:
+      - harmful_eval_harmbench_text
+      - harmful_eval_advbench
+      - harmful_eval_unified
+    utility_em:
+      type: exact_match
+      normalization: gsm8k_final_answer
+      eval_group: gsm8k_test
+    benign_refusal:
+      type: refusal_rate
+      expected_label: safe
+      eval_group: xstest_safe_eval
+transforms:
+  transforms:
+    lora_r8_s3_gsm8k:
+      type: lora_adaptation
+      rank: 8
+      step_count: 3
+      benign_dataset: gsm8k_train
+    lora_r16_s3_gsm8k:
+      type: lora_adaptation
+      rank: 16
+      step_count: 3
+      benign_dataset: gsm8k_train
+    mag20:
+      type: magnitude_pruning
+      sparsity: 0.2
+    wanda20:
+      type: wanda_pruning
+      sparsity: 0.2

@@ -1,0 +1,15 @@
+safety_judges:
+  primary:
+    name: harmbench_llama2_13b_cls
+    type: local_hf_classifier
+    path: /home/Wangjl/TRASP/models/HarmBench-Llama-2-13b-cls
+    task: harmfulness_classification
+    positive_label: harmful
+    runtime:
+      device_map: auto
+      torch_dtype: bfloat16
+      batch_size: 4
+      max_input_tokens: 2048
+      max_new_tokens: 5
+      do_sample: false
+      temperature: 0.0

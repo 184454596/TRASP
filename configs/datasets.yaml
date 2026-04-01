@@ -1,0 +1,53 @@
+schema:
+  required_fields:
+    - sample_id
+    - source_dataset
+    - split
+    - prompt
+    - answer
+    - label
+    - meta
+
+raw_sources:
+  harmbench_text:
+    type: csv
+    preferred_path: /home/Wangjl/TRASP/external/HarmBench/data/behavior_datasets/harmbench_behaviors_text_test.csv
+    fallback_path: /home/Wangjl/TRASP/external/HarmBench/data/behavior_datasets/harmbench_behaviors_text_all.csv
+    output_manifest: harmful_eval_harmbench_text.jsonl
+    output_split: harmful_eval_harmbench_text
+    source_dataset: harmbench_text
+  advbench:
+    type: hf_saved_dataset
+    path: /home/Wangjl/TRASP/data/raw/advbench
+    split: train
+    output_manifest: harmful_eval_advbench.jsonl
+    output_split: harmful_eval_advbench
+    source_dataset: advbench
+  gsm8k:
+    type: hf_saved_dataset
+    path: /home/Wangjl/TRASP/data/raw/gsm8k
+    train_split: train
+    test_split: test
+    output_manifests:
+      train: gsm8k_train.jsonl
+      test: gsm8k_test.jsonl
+    output_splits:
+      train: gsm8k_train
+      test: gsm8k_test
+    source_dataset: gsm8k
+  xstest:
+    type: hf_saved_dataset
+    path: /home/Wangjl/TRASP/data/raw/xstest
+    split: train
+    safe_label_value: safe
+    output_manifest: xstest_safe_eval.jsonl
+    output_split: xstest_safe_eval
+    source_dataset: xstest
+
+derived_manifests:
+  harmful_eval_unified:
+    output_manifest: harmful_eval_unified.jsonl
+    output_split: harmful_eval_unified
+    source_datasets:
+      - harmbench_text
+      - advbench

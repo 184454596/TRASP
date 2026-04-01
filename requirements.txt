@@ -1,0 +1,16 @@
+torch
+transformers>=4.37.0
+accelerate
+datasets
+peft
+pandas
+pyyaml
+scikit-learn
+tqdm
+matplotlib
+sentencepiece
+protobuf
+tiktoken
+einops
+scipy
+spacy
