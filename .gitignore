@@ -1,10 +1,7 @@
 models/
 data/raw/
-data/processed/manifests/
 **/.hf_cache/
 *.arrow
 data/processed/manifests/harmful_eval_pku_saferlhf_train.jsonl
 data/processed/manifests/harmful_eval_pku_saferlhf_all.jsonl
 data/processed/manifests/safe_eval_pku_saferlhf_train.jsonl
-data/raw/pku_saferlhf/.hf_cache/PKU-Alignment___pku-safe_rlhf/default/0.0.0/9421ffafec3fa40a1f1a7d567b4d525079477ecb/pku-safe_rlhf-train.arrow
-data/raw/pku_saferlhf/default/train.jsonl
