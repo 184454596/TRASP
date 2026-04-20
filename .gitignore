@@ -5,3 +5,4 @@ data/raw/
 data/processed/manifests/harmful_eval_pku_saferlhf_train.jsonl
 data/processed/manifests/harmful_eval_pku_saferlhf_all.jsonl
 data/processed/manifests/safe_eval_pku_saferlhf_train.jsonl
+external/
