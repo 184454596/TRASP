@@ -1,0 +1,17 @@
+{
+  "data_path": "/home/Wangjl/TRASP/data/processed/manifests/gsm8k_test.jsonl",
+  "model_path": "/home/Wangjl/models/Qwen/Qwen2.5-7B-Instruct",
+  "output_dir": "/home/Wangjl/TRASP/outputs/gsm8k/gsm8k_v1",
+  "predictions_path": "/home/Wangjl/TRASP/outputs/gsm8k/gsm8k_v1/predictions.jsonl",
+  "dataset_total_count": 1319,
+  "evaluated_count": 1319,
+  "start_index": 0,
+  "limit": null,
+  "batch_size": 5,
+  "max_new_tokens": 512,
+  "temperature": 0.0,
+  "correct_count": 1129,
+  "invalid_prediction_count": 0,
+  "missing_explicit_answer_count": 0,
+  "accuracy": 0.8559514783927218
+}
